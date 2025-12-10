@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Create Job{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4">
+        <h2 class="card-title mb-4">Create New Job</h2>
+
+        <!-- Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Job creation form -->
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Create Job</button>
+                <a href="{% url 'job_list' %}" class="btn btn-secondary ms-2">Back to Job List</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
