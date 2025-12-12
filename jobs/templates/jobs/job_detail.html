@@ -6,11 +6,12 @@
         <h2 class="card-title">{{ job.title }}</h2>
         <p><strong>Company:</strong> {{ job.company }}</p>
         <p><strong>Location:</strong> {{ job.location }}</p>
-        <p><strong>Type:</strong> {{ job.job_type }}</p>
-        <p><strong>Salary:</strong> ${{ job.salary }}</p>
+        <p><strong>Type:</strong> {{ job.get_job_type_display }}</p>
+        <p><strong>Salary:</strong> ₹{{ job.salary }}</p>
         <p><strong>Description:</strong> {{ job.description }}</p>
 
-        <a href="{% url 'job_list' %}" class="btn btn-secondary mt-3">Back to Job List</a>
+        <a href="{% url 'apply_job' job.id %}" class="btn btn-success mt-3">Apply Now</a>
+        <a href="{% url 'job_list' %}" class="btn btn-secondary mt-3">Back</a>
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Skill Map Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: #f5f7fa;
+        }
+        .sidebar {
+            height: 100vh;
+            background: #343a40;
+            color: white;
+            padding-top: 20px;
+        }
+        .sidebar a {
+            color: #ddd;
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background: #495057;
+            color: white;
+        }
+        .badge-skill {
+            padding: 8px 12px;
+            margin: 5px;
+        }
+        .card {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <h4 class="text-center mb-4">
+                <i class="bi bi-person-badge"></i> SkillMap
+            </h4>
+
+            <a href="#"><i class="bi bi-speedometer"></i> Dashboard</a>
+            <a href="#"><i class="bi bi-file-earmark-arrow-up"></i> Upload Resume</a>
+            <a href="#"><i class="bi bi-github"></i> GitHub Insights</a>
+            <a href="#"><i class="bi bi-linkedin"></i> LinkedIn Skills</a>
+            <a href="#"><i class="bi bi-bar-chart"></i> Analytics</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 p-4">
+
+            <h2 class="mb-4">
+                <i class="bi bi-bar-chart"></i> Skill Map Dashboard
+            </h2>
+
+            <!-- ================= -->
+            <!-- Upload Section -->
+            <!-- ================= -->
+            <div class="card p-4 shadow-sm mb-4">
+                <h4>Generate Skill Map</h4>
+                <form id="skillMapForm" enctype="multipart/form-data" method="post">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Upload Resume:</label>
+                            <input type="file" class="form-control" id="resume" name="resume">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>GitHub Username:</label>
+                            <input type="text" class="form-control" id="github_username" name="github_username">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>LinkedIn Username:</label>
+                            <input type="text" class="form-control" id="linkedin_username" name="linkedin_username">
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary mt-3 w-100">
+                        <i class="bi bi-gear"></i> Generate Skill Map
+                    </button>
+                </form>
+            </div>
+
+            <!-- ================= -->
+            <!-- Skill Output -->
+            <!-- ================= -->
+            <div class="row">
+
+                <!-- Final Skill Map -->
+                <div class="col-md-6">
+                    <div class="card p-4 shadow-sm mb-4">
+                        <h4><i class="bi bi-lightning-charge"></i> Final Skill Map</h4>
+                        <div id="final_skills" class="mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="col-md-6">
+                    <div class="card p-4 shadow-sm mb-4">
+                        <h4><i class="bi bi-pie-chart"></i> Skill Distribution</h4>
+                        <canvas id="skillChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Resume Extracted Text -->
+            <div class="card p-4 shadow-sm mb-4">
+                <h4><i class="bi bi-file-text"></i> Resume Extracted Text</h4>
+                <pre id="resume_text" class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: scroll;"></pre>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2 w-100" id="clearBtn">
+                  <i class="bi bi-x-circle"></i> Clear
+        </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let chartInstance = null;
+
+document.getElementById("skillMapForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let formData = new FormData();
+    if (document.getElementById("resume").files.length > 0) {
+        formData.append("resume", document.getElementById("resume").files[0]);
+    }
+
+    formData.append("github_username", document.getElementById("github_username").value);
+    formData.append("linkedin_username", document.getElementById("linkedin_username").value);
+
+    fetch("/skillmap/api/create/", {
+        method: "POST",
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        body: formData,
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        // FINAL SKILL MAP
+        const finalSkillsDiv = document.getElementById("final_skills");
+        finalSkillsDiv.innerHTML = "";
+        let skills = data.profile?.final_skill_map || [];
+
+        skills.forEach(s => {
+            finalSkillsDiv.innerHTML += `<span class="badge bg-primary badge-skill">${s}</span>`;
+        });
+
+        // RESUME TEXT
+        document.getElementById("resume_text").innerText = data.profile?.resume_text || "No text found.";
+
+        // CHART
+        if (chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(document.getElementById("skillChart"), {
+            type: "pie",
+            data: {
+                labels: skills,
+                datasets: [{
+                    data: skills.map(() => 1),
+                }]
+            }
+        });
+    })
+    .catch(err => console.error(err));
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    const cookies = document.cookie.split(";");
+    cookies.forEach(c => {
+        const cookie = c.trim();
+        if (cookie.startsWith(name + "=")) cookieValue = cookie.substring(name.length + 1);
+    });
+    return cookieValue;
+}
+document.getElementById("clearBtn").addEventListener("click", function() {
+    // Clear input fields
+    document.getElementById("resume").value = "";
+    document.getElementById("github_username").value = "";
+    document.getElementById("linkedin_username").value = "";
+
+    // Clear skill output
+    document.getElementById("final_skills").innerHTML = "";
+
+    // Clear resume text
+    document.getElementById("resume_text").innerText = "";
+
+    // Clear chart
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+    }
+});
+
+</script>
+
+</body>
+</html>

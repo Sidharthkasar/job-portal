@@ -1,0 +1,34 @@
+<!-- In jobs/templates/jobs/dashboard.html -->
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4">
+        <h2 class="card-title mb-4">Dashboard</h2>
+
+        <!-- Example sections -->
+        <div class="mb-3">
+            <h5>Recent Applications</h5>
+            <!-- You can loop through recent applications here -->
+            <p>No recent applications yet.</p>
+        </div>
+
+        <div class="mb-3">
+            <h5>Saved Jobs</h5>
+            <!-- You can loop through saved jobs here -->
+            <p>No saved jobs yet.</p>
+        </div>
+
+        <div class="mb-3">
+            <h5>Notifications</h5>
+            <!-- You can loop through notifications here -->
+            <p>No notifications yet.</p>
+        </div>
+
+        <!-- Add more sections as needed -->
+    </div>
+</div>
+{% endblock %}

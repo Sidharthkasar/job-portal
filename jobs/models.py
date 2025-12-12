@@ -1,6 +1,5 @@
 from django.db import models
-
-from django.db import models
+from django.contrib.auth.models import User
 
 class Job(models.Model):
     JOB_TYPE_CHOICES = (
@@ -15,7 +14,21 @@ class Job(models.Model):
     description = models.TextField()
     salary = models.IntegerField()
     location = models.CharField(max_length=255)
-    job_type = models.CharField(max_length=50, choices=JOB_TYPE_CHOICES, default='full-time')
+    job_type = models.CharField(max_length=50, choices=JOB_TYPE_CHOICES)
 
     def __str__(self):
         return self.title
+
+
+class Application(models.Model):
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    resume = models.FileField(upload_to='resumes/')
+    cover_letter = models.TextField()
+
+    applied_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.job.title}"

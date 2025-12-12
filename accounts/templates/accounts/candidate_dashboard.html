@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Candidate Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Candidate Dashboard</h2>
+  <h5>Applied Jobs</h5>
+  {% if applied %}
+    <ul>
+      {% for a in applied %}
+        <li>{{ a.job.title }} - {{ a.status }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No applications yet.</p>
+  {% endif %}
+  <h5>Saved Jobs</h5>
+  <p>Coming soon</p>
+</div>
+{% endblock %}

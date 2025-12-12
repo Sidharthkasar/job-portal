@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Employer Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Employer Dashboard</h2>
+  <h5>Your Posted Jobs</h5>
+  {% if jobs %}
+    <table class="table">
+      <thead><tr><th>Job</th><th>Applicants</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for j in jobs %}
+          <tr>
+            <td>{{ j.title }}</td>
+            <td>{{ j.applicant_count }}</td> <!-- if you annotate -->
+            <td>
+              <a href="{% url 'job_detail' j.id %}" class="btn btn-sm btn-primary">View</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No job postings yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
