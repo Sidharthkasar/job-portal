@@ -10,8 +10,19 @@
         <p><strong>Salary:</strong> ₹{{ job.salary }}</p>
         <p><strong>Description:</strong> {{ job.description }}</p>
 
-        <a href="{% url 'apply_job' job.id %}" class="btn btn-success mt-3">Apply Now</a>
-        <a href="{% url 'job_list' %}" class="btn btn-secondary mt-3">Back</a>
+        <div class="mt-3">
+            {% if user.is_authenticated %}
+                <a href="{% url 'apply_job' job.id %}" class="btn btn-success">Apply Now</a>
+                {% if is_saved %}
+                    <a href="{% url 'save_job' job.id %}" class="btn btn-warning">Unsave Job</a>
+                {% else %}
+                    <a href="{% url 'save_job' job.id %}" class="btn btn-outline-warning">Save Job</a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-success">Login to Apply</a>
+            {% endif %}
+            <a href="{% url 'job_list' %}" class="btn btn-secondary">Back to Jobs</a>
+        </div>
     </div>
 </div>
 {% endblock %}

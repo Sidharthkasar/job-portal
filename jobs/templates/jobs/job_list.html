@@ -5,12 +5,45 @@
 {% block content %}
 <h2 class="mb-4">Available Jobs</h2>
 
+<!-- Search Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Search jobs..." value="{{ query }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="location" class="form-control" placeholder="Location" value="{{ location }}">
+            </div>
+            <div class="col-md-2">
+                <select name="job_type" class="form-select">
+                    <option value="">Job Type</option>
+                    <option value="full-time" {% if job_type == 'full-time' %}selected{% endif %}>Full Time</option>
+                    <option value="part-time" {% if job_type == 'part-time' %}selected{% endif %}>Part Time</option>
+                    <option value="internship" {% if job_type == 'internship' %}selected{% endif %}>Internship</option>
+                    <option value="remote" {% if job_type == 'remote' %}selected{% endif %}>Remote</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="min_salary" class="form-control" placeholder="Min Salary" value="{{ min_salary }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% if jobs %}
     <div class="list-group">
         {% for job in jobs %}
             <a href="{% url 'job_detail' job.id %}" class="list-group-item list-group-item-action">
-                <h5 class="mb-1">{{ job.title }}</h5>
-                <small>{{ job.company}} - {{ job.location }} - {{ job.get_job_type_display }}</small>
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ job.title }}</h5>
+                    <small>₹{{ job.salary|floatformat:0 }}</small>
+                </div>
+                <p class="mb-1">{{ job.company }}</p>
+                <small>{{ job.location }} - {{ job.get_job_type_display }}</small>
             </a>
         {% endfor %}
     </div>

@@ -3,17 +3,45 @@
 {% block content %}
 <div class="container mt-4">
   <h2>Candidate Dashboard</h2>
-  <h5>Applied Jobs</h5>
-  {% if applied %}
-    <ul>
-      {% for a in applied %}
-        <li>{{ a.job.title }} - {{ a.status }}</li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No applications yet.</p>
-  {% endif %}
-  <h5>Saved Jobs</h5>
-  <p>Coming soon</p>
+  
+  <div class="row">
+    <div class="col-md-6">
+      <h5>Applied Jobs</h5>
+      {% if applied %}
+        <ul class="list-group">
+          {% for a in applied %}
+            <li class="list-group-item">
+              <strong>{{ a.job.title }}</strong> at {{ a.job.company }}
+              <br><small>Status: {{ a.get_status_display }} | Applied: {{ a.applied_at|date:"M d, Y" }}</small>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No applications yet.</p>
+      {% endif %}
+    </div>
+    
+    <div class="col-md-6">
+      <h5>My Skills</h5>
+      {% if skill_profile %}
+        <div class="card">
+          <div class="card-body">
+            <h6>Skill Map</h6>
+            <p><strong>Skills:</strong> {{ skill_profile.final_skill_map|join:", " }}</p>
+            {% if skill_profile.github_username %}
+              <p><strong>GitHub:</strong> {{ skill_profile.github_username }}</p>
+            {% endif %}
+            {% if skill_profile.linkedin_username %}
+              <p><strong>LinkedIn:</strong> {{ skill_profile.linkedin_username }}</p>
+            {% endif %}
+            <a href="{% url 'skill_map' %}" class="btn btn-primary btn-sm">Update Skills</a>
+          </div>
+        </div>
+      {% else %}
+        <p>No skill profile yet.</p>
+        <a href="{% url 'skill_map' %}" class="btn btn-primary">Create Skill Map</a>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

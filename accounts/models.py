@@ -13,6 +13,8 @@ class Profile(models.Model):
     # Candidate-specific
     resume = models.FileField(upload_to='resumes/', blank=True, null=True)
     skills = models.JSONField(default=list, blank=True)  # simple list of skills
+    github_username = models.CharField(max_length=100, blank=True, null=True)
+    linkedin_username = models.CharField(max_length=100, blank=True, null=True)
 
     # Employer-specific
     company_name = models.CharField(max_length=255, blank=True, null=True)

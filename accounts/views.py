@@ -69,19 +69,33 @@ def profile_view(request):
 
 @login_required
 def candidate_dashboard(request):
-    # You likely have an Application model — fetch applied jobs by this user
-    # Example: from jobs.models import JobApplication
-    # applied = JobApplication.objects.filter(candidate=request.user)
-    applied = []  # placeholder; replace with real queryset
-    saved_jobs = []  # placeholder if you implement saved jobs
-    return render(request, 'accounts/candidate_dashboard.html', {'applied': applied, 'saved_jobs': saved_jobs})
+    from jobs.models import Application, SavedJob
+    from skillmap.models import CandidateSkillProfile
+    
+    applied = Application.objects.filter(applicant=request.user).select_related('job')
+    saved_jobs = SavedJob.objects.filter(user=request.user).select_related('job')
+    skill_profile = CandidateSkillProfile.objects.filter(
+        github_username=request.user.profile.github_username,
+        linkedin_username=request.user.profile.linkedin_username
+    ).first()
+    
+    return render(request, 'accounts/candidate_dashboard.html', {
+        'applied': applied, 
+        'saved_jobs': saved_jobs,
+        'skill_profile': skill_profile
+    })
 
 @login_required
 def employer_dashboard(request):
-    # employer should see jobs they've posted and counts of applications per job
-    # Example: jobs = Job.objects.filter(posted_by=request.user)  # if you tracked that
-    jobs = []  # placeholder; replace with real queryset
-    return render(request, 'accounts/employer_dashboard.html', {'jobs': jobs})
+    from jobs.models import Job, Application
+    
+    jobs = Job.objects.filter(company__icontains=request.user.profile.company_name or '')
+    applications = Application.objects.filter(job__in=jobs).select_related('job', 'applicant')
+    
+    return render(request, 'accounts/employer_dashboard.html', {
+        'jobs': jobs,
+        'applications': applications
+    })
 
 @login_required
 def dashboard_view(request):

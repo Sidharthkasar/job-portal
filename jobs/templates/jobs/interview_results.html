@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Interview Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Interview Results</h4>
+                    <small>Job: {{ session.job_application.job.title }}</small>
+                </div>
+
+                <div class="card-body">
+                    <!-- Overall Score -->
+                    <div class="text-center mb-4">
+                        <h2 class="display-4 text-primary">{{ final_score|floatformat:1 }}%</h2>
+                        <p class="text-muted">Overall Interview Score</p>
+                        <div class="progress mb-3" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ final_score }}%"
+                                 aria-valuenow="{{ final_score }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skill Breakdown -->
+                    {% if skill_breakdown %}
+                    <div class="mb-4">
+                        <h5>Skill Performance Breakdown</h5>
+                        <div class="row">
+                            {% for skill_info in skill_data %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold">{{ skill_info.name|title }}</span>
+                                            <span class="badge bg-primary">{{ skill_info.score|floatformat:1 }}/5</span>
+                                        </div>
+                                        <div class="progress mt-2" style="height: 8px;">
+                                            <div class="progress-bar"
+                                                 role="progressbar"
+                                                 style="width: {{ skill_info.percentage }}%"
+                                                 aria-valuenow="{{ skill_info.score }}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Detailed Responses -->
+                    <div class="mb-4">
+                        <h5>Your Responses</h5>
+                        <div class="accordion" id="responsesAccordion">
+                            {% for response in responses %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#collapse{{ forloop.counter }}"
+                                            aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}"
+                                            aria-controls="collapse{{ forloop.counter }}">
+                                        <strong>Q{{ forloop.counter }}:</strong> {{ response.question.skill|title }}
+                                        <span class="badge bg-secondary ms-2">Score: {{ response.score }}/5</span>
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ forloop.counter }}"
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                                     aria-labelledby="heading{{ forloop.counter }}"
+                                     data-bs-parent="#responsesAccordion">
+                                    <div class="accordion-body">
+                                        <div class="mb-3">
+                                            <strong>Question:</strong>
+                                            <p>{{ response.question.question_text }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Your Answer:</strong>
+                                            <p class="border-start border-primary border-3 ps-3">{{ response.candidate_answer }}</p>
+                                        </div>
+                                        {% if response.question.expected_answer %}
+                                        <div class="mb-3">
+                                            <strong>Expected Answer:</strong>
+                                            <p class="text-muted">{{ response.question.expected_answer }}</p>
+                                        </div>
+                                        {% endif %}
+                                        {% if response.feedback %}
+                                        <div class="alert alert-info">
+                                            <strong>Feedback:</strong> {{ response.feedback }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="text-center">
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary me-2">
+                            <i class="bi bi-house"></i> Back to Dashboard
+                        </a>
+                        <a href="{% url 'job_list' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-search"></i> Browse More Jobs
+                        </a>
+                    </div>
+
+                    <!-- Performance Insights -->
+                    <div class="mt-4 alert alert-light">
+                        <h6><i class="bi bi-graph-up"></i> Performance Insights</h6>
+                        {% if final_score >= 80 %}
+                        <p class="text-success mb-0">Excellent performance! You demonstrated strong skills across multiple areas.</p>
+                        {% elif final_score >= 60 %}
+                        <p class="text-warning mb-0">Good performance with room for improvement in some areas.</p>
+                        {% else %}
+                        <p class="text-danger mb-0">Consider focusing on skill development in the areas shown above.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

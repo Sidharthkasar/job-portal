@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Interview Session{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Interview Session</h4>
+                    <small>Job: {{ session.job_application.job.title }}</small>
+                </div>
+
+                <div class="card-body">
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: {{ progress }}%"
+                                 aria-valuenow="{{ progress }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                                Question {{ question_number }} of {{ total_questions }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Question -->
+                    <div class="question-section mb-4">
+                        <h5 class="text-primary">Question {{ question_number }}</h5>
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <p class="card-text lead">{{ question.question_text }}</p>
+                                <div class="badge bg-secondary">{{ question.get_skill_display }}</div>
+                                <div class="badge bg-info ms-2">{{ question.get_difficulty_display }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Answer Form -->
+                    <form method="post" action="{% url 'submit_answer' session.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="question_id" value="{{ question.id }}">
+
+                        <div class="mb-3">
+                            <label for="answer" class="form-label">Your Answer:</label>
+                            <textarea class="form-control"
+                                      id="answer"
+                                      name="answer"
+                                      rows="6"
+                                      placeholder="Type your answer here..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                Submit Answer <i class="bi bi-check-circle"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Tips -->
+                    <div class="mt-4 alert alert-info">
+                        <h6><i class="bi bi-lightbulb"></i> Tips for answering:</h6>
+                        <ul class="mb-0">
+                            <li>Be specific and provide examples when possible</li>
+                            <li>Explain your thought process</li>
+                            <li>Keep answers concise but comprehensive</li>
+                            <li>You can reference your experience or projects</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-save draft (optional enhancement)
+document.getElementById('answer').addEventListener('input', function() {
+    localStorage.setItem('interview_draft_{{ session.id }}_{{ question.id }}', this.value);
+});
+
+// Load draft on page load
+window.addEventListener('load', function() {
+    const draft = localStorage.getItem('interview_draft_{{ session.id }}_{{ question.id }}');
+    if (draft) {
+        document.getElementById('answer').value = draft;
+    }
+});
+</script>
+{% endblock %}

@@ -20,17 +20,39 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'job_list' %}">Jobs</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_job' %}">Create Job</a>
-                    </li>
-                    <!-- Add more links here if needed -->
-                    <!-- In templates/base.html -->
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                    </li>
-
-
+                    {% if user.is_authenticated %}
+                        {% if user.profile.role == 'employer' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'create_job' %}">Post Job</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'employer_dashboard' %}">Employer Dashboard</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'skill_map' %}">Skill Map</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'candidate_dashboard' %}">My Dashboard</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <span class="nav-link text-light">Welcome, {{ user.username }}!</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
